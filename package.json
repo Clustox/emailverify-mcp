@@ -1,0 +1,57 @@
+{
+  "name": "@emailverifyio/emailverify-mcp",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for EmailVerify.io. Provides email validation, bulk validation, and email finder capabilities.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "emailverify-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.js --external:@modelcontextprotocol/sdk --banner:js='#!/usr/bin/env node' && chmod +x dist/index.js",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "node test-mcp.js",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "emailverify",
+    "email-validation",
+    "email-verification",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "email",
+    "ai-tools",
+    "cursor",
+    "claude",
+    "email-finder",
+    "bulk-validation"
+  ],
+  "author": "EmailVerify",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "esbuild": "^0.27.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
