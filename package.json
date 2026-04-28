@@ -1,11 +1,11 @@
 {
   "name": "@emailverifyio/emailverify-mcp",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Model Context Protocol server for EmailVerify.io. Provides email validation, bulk validation, and email finder capabilities.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "emailverify-mcp": "./dist/index.js"
+    "emailverify-mcp": "dist/index.js"
   },
   "files": [
     "dist",
@@ -13,7 +13,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rm -rf dist && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.js --external:@modelcontextprotocol/sdk --banner:js='#!/usr/bin/env node' && chmod +x dist/index.js",
+    "build": "rm -rf dist && esbuild src/index.ts --bundle --platform=node --format=esm --outfile=dist/index.js --external:@modelcontextprotocol/sdk --external:node:* --banner:js='#!/usr/bin/env node' && chmod +x dist/index.js",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "test": "node test-mcp.js",
@@ -33,7 +33,9 @@
     "cursor",
     "claude",
     "email-finder",
-    "bulk-validation"
+    "bulk-validation",
+    "emailverify-mcp",
+    "emailverify-sdk"
   ],
   "author": "EmailVerify",
   "license": "Apache-2.0",
@@ -54,4 +56,3 @@
     "node": ">=18.0.0"
   }
 }
-

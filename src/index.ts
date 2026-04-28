@@ -13,11 +13,17 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { EmailVerifyClient } from './emailverify-client.js';
 import { getAllTools, getToolRegistry } from './tools/index.js';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { createInterface } from 'node:readline/promises';
 
 interface ServerConfig {
   apiKey: string;
   baseUrl: string;
 }
+
+const CONFIG_FILE = join(homedir(), '.emailverify-mcp.json');
 
 class EmailVerifyMCPServer {
   private server: Server;
@@ -131,43 +137,70 @@ class EmailVerifyMCPServer {
   }
 }
 
-// Parse command line arguments
-function parseArgs(): ServerConfig {
-  const args = process.argv.slice(2);
-  const config: ServerConfig = {
-    apiKey: '',
-    baseUrl: 'https://app.emailverify.io',
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    const nextArg = args[i + 1];
-
-    if (arg === '--api-key' || arg === '-k') {
-      if (nextArg) {
-        config.apiKey = nextArg;
-        i++;
-      } else {
-        throw new Error('--api-key requires a value');
-      }
-    } else if (arg.startsWith('--api-key=')) {
-      config.apiKey = arg.split('=')[1];
-    } else if (arg === '--base-url') {
-      if (nextArg) {
-        config.baseUrl = nextArg;
-        i++;
-      } else {
-        throw new Error('--base-url requires a value');
-      }
-    } else if (arg.startsWith('--base-url=')) {
-      config.baseUrl = arg.split('=')[1];
+// Load config from file
+function loadSavedConfig(): Partial<ServerConfig> {
+  if (existsSync(CONFIG_FILE)) {
+    try {
+      return JSON.parse(readFileSync(CONFIG_FILE, 'utf-8'));
+    } catch (e) {
+      console.error(`Error reading config file: ${e}`);
     }
   }
+  return {};
+}
 
-  if (!config.apiKey) {
-    throw new Error(
-      'EmailVerify API key is required. Provide it via --api-key flag.'
-    );
+// Save config to file
+function saveConfig(config: ServerConfig): void {
+  try {
+    writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+    console.log(`Config saved to ${CONFIG_FILE}`);
+  } catch (e) {
+    console.error(`Error saving config: ${e}`);
+  }
+}
+
+// Interactive setup
+async function runSetup(): Promise<void> {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  console.log('\n--- EmailVerify MCP Setup ---');
+  const apiKey = await rl.question('Enter your EmailVerify API key: ');
+  const baseUrl = 'https://app.emailverify.io';
+  
+  rl.close();
+
+  if (!apiKey) {
+    console.error('Error: API Key is required.');
+    process.exit(1);
+  }
+
+  saveConfig({ apiKey, baseUrl });
+  console.log('Setup complete! You can now use the server without manual configuration.');
+}
+
+// Parse command line arguments
+function parseArgs(): ServerConfig | 'setup' {
+  const args = process.argv.slice(2);
+  const saved = loadSavedConfig();
+  
+  const config: ServerConfig = {
+    apiKey: args.find(a => a.startsWith('--api-key='))?.split('=')[1] || saved.apiKey || process.env.EMAILVERIFY_API_KEY || '',
+    baseUrl: args.find(a => a.startsWith('--base-url='))?.split('=')[1] || saved.baseUrl || process.env.EMAILVERIFY_BASE_URL || 'https://app.emailverify.io',
+  };
+
+  // Check for positional arguments
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === 'setup') return 'setup';
+    
+    if ((arg === '--api-key' || arg === '-k') && args[i + 1]) {
+      config.apiKey = args[i + 1];
+    } else if (arg === '--base-url' && args[i + 1]) {
+      config.baseUrl = args[i + 1];
+    }
   }
 
   return config;
@@ -176,8 +209,20 @@ function parseArgs(): ServerConfig {
 // Main entry point
 async function main(): Promise<void> {
   try {
-    const config = parseArgs();
-    const server = new EmailVerifyMCPServer(config);
+    const configResult = parseArgs();
+
+    if (configResult === 'setup') {
+      await runSetup();
+      return;
+    }
+
+    if (!configResult.apiKey) {
+      console.error('\nError: EmailVerify API key is missing.');
+      console.error('Run "emailverify-mcp setup" to configure, or provide it via --api-key flag.\n');
+      process.exit(1);
+    }
+
+    const server = new EmailVerifyMCPServer(configResult);
     await server.run();
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -190,4 +235,3 @@ main().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });
-
