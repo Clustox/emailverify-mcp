@@ -138,6 +138,13 @@ export class EmailVerifyClient {
   }
 
   /**
+   * Validate API key
+   */
+  async validateKey(): Promise<{ valid: boolean }> {
+    return this.request<{ valid: boolean }>('/api/v1/validate-key');
+  }
+
+  /**
    * Get account balance and status
    */
   async getAccountBalance(): Promise<AccountBalanceResponse> {

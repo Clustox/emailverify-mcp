@@ -28,16 +28,62 @@ This is the official **MCP (Model Context Protocol)** server for **EmailVerify.i
 
 The easiest way to integrate EmailVerify with your AI tools is our built-in configuration tool.
 
-1.  **Configure API Key**:
+1.  **Run the Master Setup**:
     ```bash
     npx @emailverifyio/emailverify-mcp setup
     ```
-    *This will prompt you for your **API key** and save it securely to `~/.emailverify-mcp.json`.*
+    *This will prompt you for your **API key**, validate it, and then offer to **automatically configure Claude Code** for you.*
 
-2.  **Add to your AI Tool**:
-    Add the server without flags (the key is loaded automatically):
-    * **Claude Code / CLI**: `claude mcp add @emailverifyio/emailverify-mcp`
-    * **Cursor / VS Code**: Add a command server: `npx @emailverifyio/emailverify-mcp`.
+2.  **Start Using**:
+    * **Claude Code / CLI**: Simply run `claude` and start using the tools.
+    * **Other Tools**: Follow the detailed guide below.
+
+---
+
+## 🔌 Manual Integration Guide
+
+Since you've already run the `setup`, you don't need to pass your API key again. Use the commands below for your preferred tools:
+
+### **Cursor IDE**
+1. Open **Cursor Settings** (`Ctrl + Shift + J`).
+2. Navigate to **General** -> **MCP**.
+3. Click **+ Add New MCP Server**.
+4. **Name**: `emailverify`
+5. **Type**: `command`
+6. **Command**:
+   ```bash
+   npx @emailverifyio/emailverify-mcp
+   ```
+
+### **Claude Desktop**
+Add this to your configuration file (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "emailverify": {
+      "command": "npx",
+      "args": ["-y", "@emailverifyio/emailverify-mcp"]
+    }
+  }
+}
+```
+
+### **Zed Editor**
+Add this to your `settings.json`:
+
+```json
+{
+  "node": {
+    "mcp_servers": {
+      "emailverify": {
+        "command": "npx",
+        "args": ["-y", "@emailverifyio/emailverify-mcp"]
+      }
+    }
+  }
+}
+```
 
 ---
 

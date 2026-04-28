@@ -17,6 +17,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
+import { execSync } from 'node:child_process';
 
 interface ServerConfig {
   apiKey: string;
@@ -159,7 +160,7 @@ function saveConfig(config: ServerConfig): void {
   }
 }
 
-// Interactive setup
+// Interactive setup with validation
 async function runSetup(): Promise<void> {
   const rl = createInterface({
     input: process.stdin,
@@ -167,25 +168,56 @@ async function runSetup(): Promise<void> {
   });
 
   console.log('\n--- EmailVerify MCP Setup ---');
-  const apiKey = await rl.question('Enter your EmailVerify API key: ');
-  const baseUrl = 'https://app.emailverify.io';
   
-  rl.close();
+  let validKey = false;
+  let apiKey = '';
+  const baseUrl = 'https://app.emailverify.io';
 
-  if (!apiKey) {
-    console.error('Error: API Key is required.');
-    process.exit(1);
+  while (!validKey) {
+    apiKey = await rl.question('Enter your EmailVerify API key: ');
+    
+    if (!apiKey) {
+      console.error('Error: API Key is required.');
+      continue;
+    }
+
+    console.log('Validating API key...');
+    const client = new EmailVerifyClient({ apiKey, baseUrl });
+    
+    try {
+      await client.validateKey();
+      validKey = true;
+      console.log('✅ API key is valid!');
+    } catch (e) {
+      console.error('❌ Error: Invalid API key. Please check your key and try again.');
+    }
+  }
+  
+  saveConfig({ apiKey, baseUrl });
+  console.log('✅ Configuration saved successfully!');
+
+  // Automatically try to add to Claude Code
+  const integrate = await rl.question('\nWould you like to automatically add this server to Claude Code? (y/n): ');
+  if (integrate.toLowerCase() === 'y' || integrate === '') {
+    try {
+      console.log('Integrating with Claude Code...');
+      execSync('claude mcp add emailverify -- npx -y @emailverifyio/emailverify-mcp', { stdio: 'inherit' });
+      console.log('✅ Successfully added to Claude Code!');
+    } catch (e) {
+      console.warn('⚠️ Could not automatically add to Claude Code. Please ensure "claude" CLI is installed.');
+      console.log('You can manually add it by running: claude mcp add emailverify -- npx -y @emailverifyio/emailverify-mcp');
+    }
   }
 
-  saveConfig({ apiKey, baseUrl });
-  console.log('Setup complete! You can now use the server without manual configuration.');
+  rl.close();
+  console.log('\nFinal Setup complete! You can now use EmailVerify in your AI tools.');
 }
 
 // Parse command line arguments
 function parseArgs(): ServerConfig | 'setup' {
   const args = process.argv.slice(2);
   const saved = loadSavedConfig();
-  
+
   const config: ServerConfig = {
     apiKey: args.find(a => a.startsWith('--api-key='))?.split('=')[1] || saved.apiKey || process.env.EMAILVERIFY_API_KEY || '',
     baseUrl: args.find(a => a.startsWith('--base-url='))?.split('=')[1] || saved.baseUrl || process.env.EMAILVERIFY_BASE_URL || 'https://app.emailverify.io',
@@ -195,7 +227,7 @@ function parseArgs(): ServerConfig | 'setup' {
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === 'setup') return 'setup';
-    
+
     if ((arg === '--api-key' || arg === '-k') && args[i + 1]) {
       config.apiKey = args[i + 1];
     } else if (arg === '--base-url' && args[i + 1]) {
