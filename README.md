@@ -1,63 +1,83 @@
-# Email Verification & Discovery MCP Server (@emailverifyio/emailverify-mcp)
+# EmailVerify MCP Server
 
-### Professional Email Validation & Discovery for AI Tools (Cursor, Claude, VS Code)
+A Model Context Protocol (MCP) server that provides professional email validation and discovery capabilities using [EmailVerify.io](https://emailverify.io). This server enables LLMs to verify email deliverability, detect risky addresses, and find professional contact information directly within your AI chat.
 
-This is the official **MCP (Model Context Protocol)** server for **EmailVerify.io**. It enables AI coding assistants and LLMs to perform real-time **email verification**, **bulk email validation**, and **professional email discovery** directly within your conversation.
+## Key Features
 
-🚀 Boost your AI's capabilities with accurate, SMTP-level email intelligence.
+- **Sub-100ms API Response**: Optimized for real-time AI workflows.
+- **High Accuracy**: Advanced SMTP-level verification and domain analysis.
+- **Enterprise Ready**: Detects catch-all, disposable, and fraudulent emails.
+- **Professional Discovery**: Find verified email addresses by name and domain.
+- **Deterministic Tools**: Structured data output for reliable LLM reasoning.
 
-- **Real-time Email Verification**: Instant SMTP-level checks.
-- **Identify Risky Emails**: Detect disposable, catch-all, and fraudulent addresses.
-- **Professional Email Finder**: Discover contact information by name and domain.
-- **Account Credit Tracking**: Monitor your EmailVerify.io balance via AI.
-- **High Performance**: Sub-100ms API response times.
+## Requirements
 
-👉 **Start for free:** [https://emailverify.io](https://emailverify.io)
+- **Node.js**: 18.0.0 or newer
+- **MCP Client**: Cursor, Claude Desktop, Claude Code, VS Code, or any other compatible client.
+
+## Getting started
+
+First, install and configure the EmailVerify MCP server using the Master Setup command.
+
+### 🚀 Master Setup (Zero-Config)
+
+```bash
+npx @emailverifyio/emailverify-mcp setup
+```
+*This command will prompt you for your API key, validate it, and automatically offer to configure Claude Code for you. Your key is saved locally in `~/.emailverify-mcp.json`.*
+
+### Standard Configuration
+
+For most tools, use the following JSON configuration:
+
+```json
+{
+  "mcpServers": {
+    "emailverify": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@emailverifyio/emailverify-mcp"
+      ]
+    }
+  }
+}
+```
 
 ---
 
-## Why use EmailVerify.io for MCP?
-- ⚡ **Turbo Speed**: Optimized for AI-workflow latency.
-- 🎯 **Pinpoint Accuracy**: Advanced SMTP-level checks and domain analysis.
-- 💰 **Cost-Efficient**: 10x more affordable than competitors.
-- 🔌 **Universal Integration**: Fully compatible with Cursor, Claude, n8n, and more.
+## 🔌 Integration Guide (All Clients)
 
----
+### Amp
+Add via the Amp VS Code extension settings screen or by updating your `settings.json` file:
+```json
+"amp.mcpServers": {
+  "emailverify": {
+    "command": "npx",
+    "args": ["-y", "@emailverifyio/emailverify-mcp"]
+  }
+}
+```
 
-## 🚀 Get Started (Zero-Config Setup)
+### Antigravity
+Add via the Antigravity settings or by updating your configuration file:
+```json
+"mcpServers": {
+  "emailverify": {
+    "command": "npx",
+    "args": ["-y", "@emailverifyio/emailverify-mcp"]
+  }
+}
+```
 
-The easiest way to integrate EmailVerify with your AI tools is our built-in configuration tool.
+### Claude Code
+Use the Claude Code CLI to add the server:
+```bash
+claude mcp add emailverify -- npx -y @emailverifyio/emailverify-mcp
+```
 
-1.  **Run the Master Setup**:
-    ```bash
-    npx @emailverifyio/emailverify-mcp setup
-    ```
-    *This will prompt you for your **API key**, validate it, and then offer to **automatically configure Claude Code** for you.*
-
-2.  **Start Using**:
-    * **Claude Code / CLI**: Simply run `claude` and start using the tools.
-    * **Other Tools**: Follow the detailed guide below.
-
----
-
-## 🔌 Manual Integration Guide
-
-Since you've already run the `setup`, you don't need to pass your API key again. Use the commands below for your preferred tools:
-
-### **Cursor IDE**
-1. Open **Cursor Settings** (`Ctrl + Shift + J`).
-2. Navigate to **General** -> **MCP**.
-3. Click **+ Add New MCP Server**.
-4. **Name**: `emailverify`
-5. **Type**: `command`
-6. **Command**:
-   ```bash
-   npx @emailverifyio/emailverify-mcp
-   ```
-
-### **Claude Desktop**
-Add this to your configuration file (`claude_desktop_config.json`):
-
+### Claude Desktop
+Add to your `claude_desktop_config.json` (Windows: `%APPDATA%\Claude\`, Mac/Linux: `~/.config/Claude/`):
 ```json
 {
   "mcpServers": {
@@ -69,9 +89,118 @@ Add this to your configuration file (`claude_desktop_config.json`):
 }
 ```
 
-### **Zed Editor**
-Add this to your `settings.json`:
+### Cline
+Add the standard config to your `cline_mcp_settings.json` file:
+```json
+{
+  "mcpServers": {
+    "emailverify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@emailverifyio/emailverify-mcp"]
+    }
+  }
+}
+```
 
+### Codex
+Use the Codex CLI:
+```bash
+codex mcp add emailverify npx "@emailverifyio/emailverify-mcp"
+```
+
+### Copilot CLI
+Use the interactively or add to `~/.copilot/mcp-config.json`:
+```json
+{
+  "mcpServers": {
+    "emailverify": {
+      "command": "npx",
+      "args": ["-y", "@emailverifyio/emailverify-mcp"]
+    }
+  }
+}
+```
+
+### Cursor
+Go to **Cursor Settings** -> **MCP** -> **Add new MCP Server**. 
+- **Name**: `emailverify`
+- **Type**: `command`
+- **Command**: `npx @emailverifyio/emailverify-mcp`
+
+### Factory / Droid
+Use the Factory CLI:
+```bash
+droid mcp add emailverify "npx -y @emailverifyio/emailverify-mcp"
+```
+
+### Gemini CLI
+Follow the MCP install guide and use the standard config.
+
+### Goose
+Go to **Advanced settings** -> **Extensions** -> **Add custom extension**.
+- **Type**: `STDIO`
+- **Command**: `npx`
+- **Args**: `["-y", "@emailverifyio/emailverify-mcp"]`
+
+### Junie
+Add to `.junie/mcp/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "emailverify": {
+      "command": "npx",
+      "args": ["-y", "@emailverifyio/emailverify-mcp"]
+    }
+  }
+}
+```
+
+### Kiro
+Add to `.kiro/settings/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "emailverify": {
+      "command": "npx",
+      "args": ["-y", "@emailverifyio/emailverify-mcp"]
+    }
+  }
+}
+```
+
+### LM Studio
+Go to **Program** -> **Install** -> **Edit mcp.json** and use the standard config.
+
+### opencode
+Add to `~/.config/opencode/opencode.json`:
+```json
+"mcp": {
+  "emailverify": {
+    "type": "local",
+    "command": ["npx", "-y", "@emailverifyio/emailverify-mcp"],
+    "enabled": true
+  }
+}
+```
+
+### Qodo Gen
+Open Qodo Gen chat panel -> **Connect more tools** -> **+ Add new MCP** -> Paste standard config.
+
+### VS Code
+Use the VS Code CLI:
+```bash
+code --add-mcp '{"name":"emailverify","command":"npx","args":["-y","@emailverifyio/emailverify-mcp"]}'
+```
+
+### Warp
+Go to **Settings** -> **AI** -> **Manage MCP Servers** -> **+ Add** and use the standard config.
+
+### Windsurf
+Follow Windsurf MCP documentation and use the standard config.
+
+### Zed Editor
+Add this to your `settings.json`:
 ```json
 {
   "node": {
@@ -87,48 +216,49 @@ Add this to your `settings.json`:
 
 ---
 
-## 🛠 Available Tools (Operations)
+## 🛠 Tools
 
-### **1. Email Validation (`validate_email`)**
-Verify if an email address is valid, deliverable, or disposable.
-- **Parameters:** `email` (string)
+### Core Validation
 
-### **2. Bulk Email Validation (`validate_batch`)**
-Validate lists of up to 250 emails asynchronously.
-- **Parameters:** `emails` (array), `title` (string)
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `validate_email` | Verify a single email address for deliverability and risk. | `email` (string) |
+| `validate_batch` | Start an asynchronous task to validate up to 250 emails. | `emails` (array), `title` (string) |
 
-### **3. Email Finder (`find_email`)**
-Discover a professional's email address using their name and company domain.
-- **Parameters:** `name` (string), `domain` (string)
+### Discovery & Account
 
-### **4. Account Balance (`get_balance`)**
-Check your API credits and subscription status.
-- **Parameters:** None
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `find_email` | Discover a professional email using a person's name and domain. | `name` (string), `domain` (string) |
+| `get_balance` | Check your remaining credits and account status. | None |
+| `get_bulk_results` | Retrieve results for a previously started bulk validation task. | `taskId` (string) |
 
 ---
 
 ## 💡 Practical AI Use Cases
 
 ### **Sales & Prospecting**
-*"Find the email for John Doe at stripe.com and verify if it is safe to send."*
+> "Find the email for John Doe at stripe.com and tell me if it's safe to send."
 
-### **Data Quality**
-*"I have a list of signups in this CSV. Use EmailVerify to flag any disposable or invalid emails."*
-
-### **Lead Qualification**
-*"Check if the users in this list have valid company emails before I add them to my CRM."*
+### **List Cleaning**
+> "I have a list of emails in this file. Use EmailVerify to check them and highlight which ones are disposable or catch-all."
 
 ---
 
-## 🔧 Technical Details
-- **Node.js**: Required version 18.0.0+
-- **Security**: API keys are stored locally and never transmitted to third parties except for EmailVerify.io API calls.
-- **Compliance**: Fully supports the Model Context Protocol (MCP) standard.
+## ⚙️ Configuration
 
-## 🔗 Official Links
+The server supports the following command-line flags:
+
+| Option | Description | Environment Variable |
+|--------|-------------|----------------------|
+| `--api-key` | Your EmailVerify.io API Key | `EMAILVERIFY_API_KEY` |
+| `--base-url` | API Base URL (Default: https://app.emailverify.io) | `EMAILVERIFY_BASE_URL` |
+
+---
+
+## 🔗 Resources
 - [EmailVerify.io Website](https://emailverify.io)
-- [API Reference](https://app.emailverify.io/api-docs)
-- [NPM Package](https://www.npmjs.com/package/@emailverifyio/emailverify-mcp)
+- [API Documentation](https://app.emailverify.io/api-docs)
 
 ## 📄 License
 Apache-2.0
