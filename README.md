@@ -17,6 +17,9 @@ A Model Context Protocol (MCP) server that provides professional email validatio
 
 ## Getting started
 
+To use this MCP server, you'll need an EmailVerify API key.
+👉 **Get your API key here:** [https://app.emailverify.io/api-setup](https://app.emailverify.io/api-setup)
+
 First, install and configure the EmailVerify MCP server using the Master Setup command.
 
 ### 🚀 Master Setup (Zero-Config)
@@ -258,6 +261,7 @@ The server supports the following command-line flags:
 
 ## 🔗 Resources
 - [EmailVerify.io Website](https://emailverify.io)
+- [EmailVerify MCP Guide](https://www.emailverify.io/mcp/)
 - [API Documentation](https://app.emailverify.io/api-docs)
 
 ## 📄 License
